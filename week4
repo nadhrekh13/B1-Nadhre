@@ -1,1 +1,21 @@
+login_attempts = [
+("alice", "success"),
+("bob", "failed"),
+("bob", "failed"),
+("charlie", "success"),
+("bob", "failed"),
+("alice", "success")
+]
+print("Checking login attempts for failed Logins")
+failures = {}
+for username, status in login_attempts:
+    if status == "failed":
+        if username in failures:
+            failures[username] = failures[username] + 1
+        else:
+            failures[username] = 1
+for username in failures:
+    if failures[username] >= 3:
+        print("ALERT: User '" + username + "' has " + str(failures[username]) + " failed login attempts")
 
+print("Security check complete")
