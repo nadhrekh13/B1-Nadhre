@@ -3,7 +3,11 @@ total_expenses = float(input("Enter total costs: $"))
 
 net_income = total_revenue - total_expenses
 
-profit_margin_pct = (net_income / total_revenue) * 100
+# A check is added here to prevent division by zero if revenue is 0
+if total_revenue != 0:
+    profit_margin_pct = (net_income / total_revenue) * 100
+else:
+    profit_margin_pct = 0.0
 
 print("\n--- Financial Summary ---")
 print(f"Total Revenue: ${total_revenue:,.2f}")
