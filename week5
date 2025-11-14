@@ -1,1 +1,49 @@
+def check_password_length(password):
+    MIN_LENGTH = 8
+    MAX_LENGTH = 20
 
+    password_length = len(password)
+
+    if MIN_LENGTH <= password_length <= MAX_LENGTH:
+        return True, f"✅ Password length is good: {password_length} characters."
+    elif password_length < MIN_LENGTH:
+        return False, f"❌ Password is too short. It must be at least {MIN_LENGTH} characters long (current: {password_length})."
+user_password = input("Enter your new password: ")
+
+is_valid, message = check_password_length(user_password)
+
+print("\n--- Validation Result ---")
+print(message)
+
+if is_valid:
+    print("Status: Valid Password.")
+else:
+    print("Status: Invalid Password.")
+    
+def check_password_complexity(password):
+    MIN_REQUIREMENTS = 4
+
+    has_lowercase = False
+    has_uppercase = False
+    has_digit = False
+    has_special = False
+
+    SPECIAL_CHARS = "!@#$%^&*()-_+=[]{}|;:,.<>?/~`"
+    for char in password:
+        if char.islower():
+            has_lowercase = True
+        elif char.isupper():
+            has_uppercase = True
+        elif char.isdigit():
+            has_digit = True
+        elif char in SPECIAL_CHARS:
+            has_special = True
+        if has_lowercase and has_uppercase and has_digit and has_special:
+            break
+    checks = [
+        ("Lowercase", has_lowercase, "a-z"),
+        ("Uppercase", has_uppercase, "A-Z"),
+        ("Digit", has_digit, "0-9"),
+        ("Special Char", has_special, "!@#$%...")
+    ]
+#to be continued
