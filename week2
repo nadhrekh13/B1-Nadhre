@@ -1,1 +1,13 @@
+total_revenue = float(input("Enter total revenue: $"))
+total_expenses = float(input("Enter total costs: $"))
+
+net_income = total_revenue - total_expenses
+
+profit_margin_pct = (net_income / total_revenue) * 100
+
+print("\n--- Financial Summary ---")
+print(f"Total Revenue: ${total_revenue:,.2f}")
+print(f"Total Expenses: ${total_expenses:,.2f}")
+print(f"Net Income: ${net_income:,.2f}")
+print(f"Profit Margin: {profit_margin_pct:.1f}%")
 
