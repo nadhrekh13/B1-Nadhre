@@ -79,6 +79,7 @@ def main():
     else:
         print("❌PASSWORD IS WEAK - Please address failed requirements")
         print("=" * 50)
-    
+
+
 main()    
 
