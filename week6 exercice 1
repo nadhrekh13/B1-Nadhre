@@ -1,0 +1,45 @@
+def collect_songs(count=5):
+    songs = []
+    genre_count = {}
+    for i in range(1, count + 1):
+        print(f"Enter Song {i}:")
+        try:
+            song_name = input(" Song name: ").strip()
+            genre = input(" Genre: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\nInput interrupted. Exiting.")
+            raise
+        if not song_name:
+            song_name = "<untitled>"
+        if not genre:
+            genre = "Unknown"
+        songs.append((song_name, genre))
+        genre_count[genre] = genre_count.get(genre, 0) + 1
+        print()
+    return songs, genre_count
+
+def display_library(songs):
+    print("=== YOUR MUSIC LIBRARY ===")
+    for index, (name, genre) in enumerate(songs, 1):
+        print(f"{index}. {name} ({genre})")
+
+def display_genre_stats(genre_count):
+    print("\n=== GENRE STATISTICS ===")
+    for genre, count in genre_count.items():
+        print(f"{genre}: {count} songs")
+    if genre_count:
+        most_popular = max(genre_count, key=genre_count.get)
+        print(f"\nMost popular genre: {most_popular}")
+    else:
+        print("\nMost popular genre: None")
+
+def main():
+    try:
+        songs, genre_count = collect_songs(5)
+    except (KeyboardInterrupt, EOFError):
+        return
+    display_library(songs)
+    display_genre_stats(genre_count)
+
+if __name__ == "__main__":
+    main()
