@@ -1,0 +1,127 @@
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+
+def calculate_discount(category, tier):
+    category_discounts = {
+        "electronics": 10,
+        "clothing": 15,
+        "books": 5,
+        "home": 12,
+    }
+    tier_discounts = {
+        "premium": 5,
+        "standard": 0,
+        "budget": 2,
+    }
+
+    cat_key = (category or "").strip().lower()
+    tier_key = (tier or "").strip().lower()
+
+    cat_discount = category_discounts.get(cat_key, 0)
+    if cat_key and cat_key not in category_discounts:
+        logging.debug("Unknown category '%s' treated as 0%% discount", category)
+
+    tier_discount = tier_discounts.get(tier_key, 0)
+    if tier_key and tier_key not in tier_discounts:
+        logging.debug("Unknown tier '%s' treated as 0%% discount", tier)
+
+    return cat_discount + tier_discount
+
+
+def process_products(input_file, output_file):
+    products = []
+    total_discount_pct = 0.0
+
+    try:
+        with open(input_file, "r", encoding="utf-8") as f:
+            for line_num, raw in enumerate(f, 1):
+                line = raw.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = [p.strip() for p in line.split(",")]
+                if len(parts) != 4:
+                    logging.warning("Line %d: expected 4 comma-separated values, skipping: %r", line_num, raw.rstrip("\n"))
+                    continue
+                name, price_str, category, tier = parts
+                try:
+                    base_price = float(price_str)
+                    if base_price < 0:
+                        raise ValueError("price must be non-negative")
+                except ValueError as e:
+                    logging.error("Line %d: invalid price %r - %s", line_num, price_str, e)
+                    continue
+
+                discount_pct = calculate_discount(category, tier)
+                discount_amt = base_price * (discount_pct / 100.0)
+                final_price = base_price - discount_amt
+
+                products.append({
+                    "name": name or "<unnamed>",
+                    "base_price": base_price,
+                    "discount_pct": discount_pct,
+                    "discount_amt": discount_amt,
+                    "final_price": final_price,
+                })
+                total_discount_pct += discount_pct
+
+    except FileNotFoundError:
+        logging.error("Input file '%s' not found", input_file)
+        print("Error: Input file not found:", input_file)
+        return
+    except PermissionError:
+        logging.error("Permission denied reading '%s'", input_file)
+        print("Error: Permission denied reading:", input_file)
+        return
+    except Exception as e:
+        logging.exception("Unexpected error while reading '%s': %s", input_file, e)
+        print("Unexpected error:", e)
+        return
+
+    products.sort(key=lambda p: p["final_price"], reverse=True)
+
+    try:
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write("=" * 80 + "\n")
+            f.write("PRICING REPORT\n")
+            f.write("=" * 80 + "\n")
+            f.write(f"{'Product Name':<30} {'Base Price':>12} {'Discount %':>12} {'Discount $':>12} {'Final Price':>12}\n")
+            f.write("-" * 80 + "\n")
+            for p in products:
+                f.write(f"{p['name']:<30} "
+                        f"${p['base_price']:>11.2f} "
+                        f"{p['discount_pct']:>11.1f}% "
+                        f"${p['discount_amt']:>11.2f} "
+                        f"${p['final_price']:>11.2f}\n")
+            f.write("=" * 80 + "\n")
+
+            avg_discount_pct = (total_discount_pct / len(products)) if products else 0.0
+            f.write(f"Total products processed: {len(products)}\n")
+            f.write(f"Average discount (percent average): {avg_discount_pct:.2f}%\n")
+            f.write("=" * 80 + "\n")
+
+        print("\nProcessing Complete!")
+        print("Total products processed:", len(products))
+        print("Average discount applied:", f"{avg_discount_pct:.2f}%")
+        print("Report saved to:", output_file)
+        logging.info("Successfully processed %d products", len(products))
+
+    except PermissionError:
+        logging.error("Permission denied writing to '%s'", output_file)
+        print("Error: Cannot write to output file:", output_file)
+    except Exception as e:
+        logging.exception("Unexpected error while writing '%s': %s", output_file, e)
+        print("Unexpected error while writing report:", e)
+
+
+if __name__ == "__main__":
+    try:
+        inp = input("Input file [products.txt]: ").strip() or "products.txt"
+        out = input("Output file [pricing_report.txt]: ").strip() or "pricing_report.txt"
+        verbose = input("Enable debug logging? (y/N): ").strip().lower()
+        if verbose == "y":
+            logging.getLogger().setLevel(logging.DEBUG)
+        process_products(inp, out)
+    except (KeyboardInterrupt, EOFError):
+        print("\nInterrupted. Exiting.")
