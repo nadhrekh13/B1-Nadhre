@@ -1,85 +1,81 @@
+MIN_LENGTH = 8
+SPECIAL_CHARS = "!@#$%^&*()-_+=[]{}|;:,.<>?/~`"
+
 def check_password_length(password):
-    MIN_LENGTH = 8
-    MAX_LENGTH = 20
+    length = len(password)
+    is_ok = MIN_LENGTH <= length
+    message = (
+        f"✅ Password length is good: {length} characters."
+        if is_ok else
+        f"❌ Password is too short. It must be at least {MIN_LENGTH} characters long (current: {length})."
+    )
+    return is_ok, message
 
-    password_length = len(password)
-
-    if MIN_LENGTH <= password_length <= MAX_LENGTH:
-        return True, f"✅ Password length is good: {password_length} characters."
-    elif password_length < MIN_LENGTH:
-        return False, f"❌ Password is too short. It must be at least {MIN_LENGTH} characters long (current: {password_length})."
-user_password = input("Enter your new password: ")
-
-is_valid, message = check_password_length(user_password)
-
-print("\n--- Validation Result ---")
-print(message)
-
-if is_valid:
-    print("Status: Valid Password.")
-else:
-    print("Status: Invalid Password.")
-    
 def check_password_complexity(password):
-    MIN_REQUIREMENTS = 4
-
     has_lowercase = False
     has_uppercase = False
     has_digit = False
     has_special = False
 
-    SPECIAL_CHARS = "!@#$%^&*()-_+=[]{}|;:,.<>?/~`"
-    for char in password:
-        if char.islower():
+    for ch in password:
+        if ch.islower():
             has_lowercase = True
-        elif char.isupper():
+        elif ch.isupper():
             has_uppercase = True
-        elif char.isdigit():
+        elif ch.isdigit():
             has_digit = True
-        elif char in SPECIAL_CHARS:
+        elif ch in SPECIAL_CHARS:
             has_special = True
+        # early exit if all found
         if has_lowercase and has_uppercase and has_digit and has_special:
             break
-    checks = [
-        ("Lowercase", has_lowercase, "a-z"),
-        ("Uppercase", has_uppercase, "A-Z"),
-        ("Digit", has_digit, "0-9"),
-        ("Special Char", has_special, "!@#$%...")
-    ]
-    checks['is_valid'] = all(checks.values())
+
+    checks = {
+        "min_length": len(password) >= MIN_LENGTH,
+        "has_lowercase": has_lowercase,
+        "has_uppercase": has_uppercase,
+        "has_digit": has_digit,
+        "has_special": has_special,
+    }
+    checks["is_valid"] = all(checks.values())
     return checks
+
 def main():
     print("=" * 50)
     print("PASSWORD STRENGTH VALIDATOR")
     print("=" * 50)
     print("\nPassword Requirements:")
-    print("Minimum 8 characters")
+    print(f"Minimum {MIN_LENGTH} characters")
     print("At least one uppercase letter")
     print("At least one lowercase letter")
     print("At least one digit")
-    print("At least one special character (!@#$%^&* etc.)") 
+    print("At least one special character (!@#$%^&* etc.)")
     print()
-    checks=check_password_complexity(user_password)
+
+    password = input("Enter your new password: ")
+
+    # Length check (optional separate message)
+    is_length_ok, length_msg = check_password_length(password)
+    print("\n--- Validation Result ---")
+    print(length_msg)
+    print()
+
+    checks = check_password_complexity(password)
+
     print("\n" + "=" * 50)
     print("VALIDATION RESULTS")
     print("=" * 50)
-    check_symbol = "✅" if checks['min_length'] else "❌"
-    print(f"{check_symbol} Minimum length (8+ chars): {checks['min_length']}")
-    check_symbol = "✅" if checks['has_uppercase'] else "❌"
-    print(f"{check_symbol} Contains uppercase: {checks['has_uppercase']}")
-    check_symbol = "✅" if checks['has_lowercase'] else "❌"
-    print(f"{check_symbol} Contains lowercase: {checks['has_lowercase']}")
-    check_symbol = "✅" if checks['has_digit'] else "❌"
-    print(f"{check_symbol} Contains digit: {checks['has_digit']}")
-    check_symbol = "✅" if checks['has_special'] else "❌"
-    print(f"{check_symbol} Contains special char: {checks['has_special']}")
+    print(f"{'✅' if checks['min_length'] else '❌'} Minimum length ({MIN_LENGTH}+ chars): {checks['min_length']}")
+    print(f"{'✅' if checks['has_uppercase'] else '❌'} Contains uppercase: {checks['has_uppercase']}")
+    print(f"{'✅' if checks['has_lowercase'] else '❌'} Contains lowercase: {checks['has_lowercase']}")
+    print(f"{'✅' if checks['has_digit'] else '❌'} Contains digit: {checks['has_digit']}")
+    print(f"{'✅' if checks['has_special'] else '❌'} Contains special char: {checks['has_special']}")
     print("\n" + "=" * 50)
     if checks['is_valid']:
-        print("✅PASSWORD IS STRONG!")
+        print("✅ PASSWORD IS STRONG!")
     else:
-        print("❌PASSWORD IS WEAK - Please address failed requirements")
+        print("❌ PASSWORD IS WEAK - Please address failed requirements")
         print("=" * 50)
 
-
-main()    
-
+if __name__ == "__main__":
+    main()
