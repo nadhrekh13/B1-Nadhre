@@ -1,0 +1,32 @@
+from dataclasses import dataclass
+@dataclass
+class Person:
+    name: str
+    age: int
+    
+    def introduce(self) -> str:
+        return f"Hi, I'm {self.name} and I'm {self.age} years old."
+
+@dataclass
+class Student(Person):
+    student_id: str
+
+    def introduce(self) -> str:
+        return f"Hi, I'm {self.name}, a student. My ID is {self.student_id} and I'm {self.age} years old."
+
+@dataclass
+class Teacher(Person):
+    subject: str
+
+    def introduce(self) -> str:
+        return f"Hello, I'm {self.name}, a teacher. I teach {self.subject} and I'm {self.age} years old."
+
+if __name__ == "__main__":
+    student = Student("Alice", 16, "S001")
+    teacher = Teacher("Mr. Smith", 35, "Mathematics")
+
+    print("=== School Management System ===")
+    print(student.introduce())
+    print(teacher.introduce())
+    print(f"\nStudent age: {student.age}")
+    print(f"Teacher subject: {teacher.subject}")
