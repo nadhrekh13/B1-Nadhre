@@ -1,0 +1,1 @@
+from pydantic import BaseModel\n\nclass User(BaseModel):\n    id: int\n    username: str\n    email: str\n    full_name: str = None\n    disabled: bool = False\n
