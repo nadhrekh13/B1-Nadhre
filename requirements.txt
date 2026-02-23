@@ -1,7 +1,0 @@
-# Project Dependencies
-
-Flask
-requests
-numpy
-pandas
-scikit-learn
