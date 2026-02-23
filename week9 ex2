@@ -1,0 +1,59 @@
+class Book:
+    """Represents a single book"""
+    def __init__(self, title, author, isbn):
+        self.title, self.author, self.isbn = title, author, isbn
+
+    def display_info(self):
+        return f"'{self.title}' by {self.author} (ISBN: {self.isbn})"
+
+class Library:
+    """Library class that contains Book objects (composition)"""
+    def __init__(self, name):
+        self.name = name
+        self.books = []
+
+    def add_book(self, book):
+        self.books.append(book)
+        return f"Added: {book.display_info()}"
+
+    def remove_book(self, title):
+        # Filter books using a generator
+        target = next((b for b in self.books if b.title.lower() == title.lower()), None)
+        if target:
+            self.books.remove(target)
+            return f"Removed: {target.display_info()}"
+        return f"Book '{title}' not found."
+
+    def list_books(self):
+        if not self.books:
+            return f"{self.name} has no books."
+        
+        header = f"\n=== Books in {self.name} ===\n"
+        # Use enumerate with a list comprehension for efficiency
+        lines = [f"{i}. {b.display_info()}" for i, b in enumerate(self.books, 1)]
+        return header + "\n".join(lines)
+
+    def search_by_title(self, search_term):
+        # List comprehension for finding matches
+        found = [b for b in self.books if search_term.lower() in b.title.lower()]
+        
+        if not found:
+            return f"No books found matching '{search_term}'"
+            
+        result = f"\nFound {len(found)} book(s):\n"
+        result += "\n".join([f"- {b.display_info()}" for b in found])
+        return result
+
+# Testing Logic
+library = Library("City Library")
+book_list = [
+    Book("Python Crash Course", "Eric Matthes", "978-1593279288"),
+    Book("Clean Code", "Robert Martin", "978-0132350884"),
+    Book("The Pragmatic Programmer", "Hunt & Thomas", "978-0201616224")
+]
+
+for b in book_list: print(library.add_book(b))
+print(library.list_books())
+print(library.search_by_title("Python"))
+print(library.remove_book("Clean Code"))
+print(library.list_books())
